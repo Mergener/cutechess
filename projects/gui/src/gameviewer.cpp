@@ -29,6 +29,7 @@
 #include "boardview/boardscene.h"
 #include "boardview/boardview.h"
 #include "chessclock.h"
+#include "themedicon.h"
 
 GameViewer::GameViewer(Qt::Orientation orientation,
                        QWidget* parent,
@@ -54,7 +55,8 @@ GameViewer::GameViewer(Qt::Orientation orientation,
 	m_viewFirstMoveBtn->setAutoRaise(true);
 	m_viewFirstMoveBtn->setMinimumSize(32, 32);
 	m_viewFirstMoveBtn->setToolTip(tr("Skip to the beginning"));
-	m_viewFirstMoveBtn->setIcon(QIcon(":/icons/toolbutton/first_16x16"));
+	m_viewFirstMoveBtn->setIcon(themedToolButtonIcon(m_viewFirstMoveBtn,
+		":/icons/toolbutton/first_16x16.png", ":/icons/toolbutton/first-dark.svg"));
 	connect(m_viewFirstMoveBtn, SIGNAL(clicked()),
 		this, SLOT(viewFirstMoveClicked()));
 
@@ -62,7 +64,8 @@ GameViewer::GameViewer(Qt::Orientation orientation,
 	m_viewPreviousMoveBtn->setAutoRaise(true);
 	m_viewPreviousMoveBtn->setMinimumSize(32, 32);
 	m_viewPreviousMoveBtn->setToolTip(tr("Previous move"));
-	m_viewPreviousMoveBtn->setIcon(QIcon(":/icons/toolbutton/previous_16x16"));
+	m_viewPreviousMoveBtn->setIcon(themedToolButtonIcon(m_viewPreviousMoveBtn,
+		":/icons/toolbutton/previous_16x16.png", ":/icons/toolbutton/previous-dark.svg"));
 	connect(m_viewPreviousMoveBtn, SIGNAL(clicked()),
 		this, SLOT(viewPreviousMoveClicked()));
 
@@ -70,7 +73,8 @@ GameViewer::GameViewer(Qt::Orientation orientation,
 	m_viewNextMoveBtn->setAutoRaise(true);
 	m_viewNextMoveBtn->setMinimumSize(32, 32);
 	m_viewNextMoveBtn->setToolTip(tr("Next move"));
-	m_viewNextMoveBtn->setIcon(QIcon(":/icons/toolbutton/next_16x16"));
+	m_viewNextMoveBtn->setIcon(themedToolButtonIcon(m_viewNextMoveBtn,
+		":/icons/toolbutton/next_16x16.png", ":/icons/toolbutton/next-dark.svg"));
 	connect(m_viewNextMoveBtn, SIGNAL(clicked()),
 		this, SLOT(viewNextMoveClicked()));
 
@@ -78,7 +82,8 @@ GameViewer::GameViewer(Qt::Orientation orientation,
 	m_viewLastMoveBtn->setAutoRaise(true);
 	m_viewLastMoveBtn->setMinimumSize(32, 32);
 	m_viewLastMoveBtn->setToolTip(tr("Skip to the end"));
-	m_viewLastMoveBtn->setIcon(QIcon(":/icons/toolbutton/last_16x16"));
+	m_viewLastMoveBtn->setIcon(themedToolButtonIcon(m_viewLastMoveBtn,
+		":/icons/toolbutton/last_16x16.png", ":/icons/toolbutton/last-dark.svg"));
 	connect(m_viewLastMoveBtn, SIGNAL(clicked()),
 		this, SLOT(viewLastMoveClicked()));
 

@@ -29,6 +29,7 @@
 #include "cutechessapp.h"
 #include "engineconfigurationmodel.h"
 #include "engineconfigurationdlg.h"
+#include "themedicon.h"
 
 
 EngineManagementWidget::EngineManagementWidget(QWidget* parent)
@@ -39,6 +40,12 @@ EngineManagementWidget::EngineManagementWidget(QWidget* parent)
 	  ui(new Ui::EngineManagementWidget)
 {
 	ui->setupUi(this);
+	ui->m_addBtn->setIcon(themedToolButtonIcon(ui->m_addBtn,
+		":/icons/toolbutton/add_16x16.png", ":/icons/toolbutton/add-dark.svg"));
+	ui->m_removeBtn->setIcon(themedToolButtonIcon(ui->m_removeBtn,
+		":/icons/toolbutton/remove_16x16.png", ":/icons/toolbutton/remove-dark.svg"));
+	ui->m_configureBtn->setIcon(themedToolButtonIcon(ui->m_configureBtn,
+		":/icons/toolbutton/configure_16x16.png", ":/icons/toolbutton/configure-dark.svg"));
 
 	// Set up a filtered model
 	m_filteredModel->setSourceModel(new EngineConfigurationModel(

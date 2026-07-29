@@ -8,14 +8,23 @@
         <file>cutechess_256x256.png</file>
         <file>cutechess_512x512.png</file>
         <file>toolbutton/add_16x16.png</file>
+		<file>toolbutton/add-dark.svg</file>
         <file>toolbutton/clone_16x16.png</file>
-        <file>toolbutton/configure_16x16.png</file>
+		<file>toolbutton/configure_16x16.png</file>
+		<file>toolbutton/configure-dark.svg</file>
         <file>toolbutton/first_16x16.png</file>
+		<file>toolbutton/first-dark.svg</file>
         <file>toolbutton/last_16x16.png</file>
+		<file>toolbutton/last-dark.svg</file>
         <file>toolbutton/next_16x16.png</file>
+		<file>toolbutton/next-dark.svg</file>
         <file>toolbutton/previous_16x16.png</file>
+		<file>toolbutton/previous-dark.svg</file>
         <file>toolbutton/remove_16x16.png</file>
+		<file>toolbutton/remove-dark.svg</file>
         <file>toolbutton/lock-closed.svg</file>
+		<file>toolbutton/lock-closed-dark.svg</file>
         <file>toolbutton/lock-open.svg</file>
+		<file>toolbutton/lock-open-dark.svg</file>
     </qresource>
 </RCC>

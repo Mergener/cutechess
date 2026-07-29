@@ -18,12 +18,16 @@
 
 #include "pairtimecontroldlg.h"
 #include "ui_pairtimecontroldlg.h"
+#include "themedicon.h"
 
 PairTimeControlDialog::PairTimeControlDialog(const TimeControl& tc1, const TimeControl& tc2,
                                              QWidget* parent)
     : QDialog(parent), ui(new Ui::PairTimeControlDialog)
 {
 	ui->setupUi(this);
+	ui->m_sameTc->setIcon(themedToggleIcon(ui->m_sameTc,
+		":/icons/toolbutton/lock-open.svg", ":/icons/toolbutton/lock-closed.svg",
+		":/icons/toolbutton/lock-open-dark.svg", ":/icons/toolbutton/lock-closed-dark.svg"));
 
 	connect(ui->m_sameTc, &QToolButton::toggled, [=](bool checked)
 	{

@@ -36,6 +36,7 @@
 #include "engineconfigurationdlg.h"
 #include "timecontroldlg.h"
 #include "engineselectiondlg.h"
+#include "themedicon.h"
 
 #if 0
 #include <modeltest.h>
@@ -49,6 +50,12 @@ NewTournamentDialog::NewTournamentDialog(EngineManager* engineManager,
 {
 	Q_ASSERT(engineManager != nullptr);
 	ui->setupUi(this);
+	ui->m_addEngineBtn->setIcon(themedToolButtonIcon(ui->m_addEngineBtn,
+		":/icons/toolbutton/add_16x16.png", ":/icons/toolbutton/add-dark.svg"));
+	ui->m_removeEngineBtn->setIcon(themedToolButtonIcon(ui->m_removeEngineBtn,
+		":/icons/toolbutton/remove_16x16.png", ":/icons/toolbutton/remove-dark.svg"));
+	ui->m_configureEngineBtn->setIcon(themedToolButtonIcon(ui->m_configureEngineBtn,
+		":/icons/toolbutton/configure_16x16.png", ":/icons/toolbutton/configure-dark.svg"));
 
 	m_srcEnginesModel = new EngineConfigurationModel(engineManager, this);
 	#if 0

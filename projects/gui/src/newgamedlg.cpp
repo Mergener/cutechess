@@ -18,6 +18,7 @@
 
 #include "newgamedlg.h"
 #include "ui_newgamedlg.h"
+#include "themedicon.h"
 
 #include <QAbstractItemView>
 #include <QSettings>
@@ -46,6 +47,12 @@ NewGameDialog::NewGameDialog(EngineManager* engineManager, QWidget* parent)
 {
 	Q_ASSERT(engineManager != nullptr);
 	ui->setupUi(this);
+	ui->m_configureWhiteEngineButton->setIcon(themedToolButtonIcon(
+		ui->m_configureWhiteEngineButton, ":/icons/toolbutton/configure_16x16.png",
+		":/icons/toolbutton/configure-dark.svg"));
+	ui->m_configureBlackEngineButton->setIcon(themedToolButtonIcon(
+		ui->m_configureBlackEngineButton, ":/icons/toolbutton/configure_16x16.png",
+		":/icons/toolbutton/configure-dark.svg"));
 	ui->m_gameSettings->enableSplitTimeControls(true);
 
 	m_engines = new EngineConfigurationModel(m_engineManager, this);
