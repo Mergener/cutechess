@@ -52,6 +52,7 @@
 #include "pgntagsmodel.h"
 #include "gametabbar.h"
 #include "evalhistory.h"
+#include "evalbar.h"
 #include "evalwidget.h"
 #include "boardview/boardscene.h"
 #include "tournamentresultsdlg.h"
@@ -100,6 +101,8 @@ MainWindow::MainWindow(ChessGame* game)
 	#endif
 
 	m_evalHistory = new EvalHistory(this);
+	m_evalBars[0] = new EvalBar(this);
+	m_evalBars[1] = new EvalBar(this);
 	m_evalWidgets[0] = new EvalWidget(this);
 	m_evalWidgets[1] = new EvalWidget(this);
 
@@ -133,6 +136,15 @@ MainWindow::MainWindow(ChessGame* game)
 			evalWidget, SLOT(onMoveMade(int)));
 		connect(m_moveList, SIGNAL(moveClicked(int,bool)),
 			evalWidget, SLOT(viewMove(int)));
+	}
+	for (auto evalBar : m_evalBars)
+	{
+		connect(m_gameViewer, SIGNAL(moveSelected(int)),
+			evalBar, SLOT(viewMove(int)));
+		connect(m_gameViewer, SIGNAL(liveMoveChanged(int)),
+			evalBar, SLOT(onMoveMade(int)));
+		connect(m_moveList, SIGNAL(moveClicked(int,bool)),
+			evalBar, SLOT(viewMove(int)));
 	}
 
 	connect(CuteChessApplication::instance()->gameManager(),
@@ -396,6 +408,44 @@ void MainWindow::createDockWindows()
 	blackEvalDock->setWidget(m_evalWidgets[Chess::Side::Black]);
 	addDockWidget(Qt::RightDockWidgetArea, blackEvalDock);
 
+	// White-point-of-view evaluation bars for each engine
+	auto whiteEvalBarDock = new QDockWidget(tr("Engine (white)"), this);
+	m_evalBarDocks[Chess::Side::White] = whiteEvalBarDock;
+	whiteEvalBarDock->setObjectName("WhiteEvalBarDock");
+	whiteEvalBarDock->setWidget(m_evalBars[Chess::Side::White]);
+	addDockWidget(Qt::RightDockWidgetArea, whiteEvalBarDock);
+	auto blackEvalBarDock = new QDockWidget(tr("Engine (black)"), this);
+	m_evalBarDocks[Chess::Side::Black] = blackEvalBarDock;
+	blackEvalBarDock->setObjectName("BlackEvalBarDock");
+	blackEvalBarDock->setWidget(m_evalBars[Chess::Side::Black]);
+	addDockWidget(Qt::RightDockWidgetArea, blackEvalBarDock);
+
+	auto configureEvalBarDock = [this](QDockWidget* dock, EvalBar* bar)
+	{
+		auto updateOrientation = [dock, bar](Qt::DockWidgetArea area)
+		{
+			const bool horizontal = area == Qt::TopDockWidgetArea
+					     || area == Qt::BottomDockWidgetArea;
+			bar->setOrientation(horizontal ? Qt::Horizontal
+						      : Qt::Vertical);
+
+			auto features = dock->features();
+			if (horizontal)
+				features &= ~QDockWidget::DockWidgetVerticalTitleBar;
+			else
+				features |= QDockWidget::DockWidgetVerticalTitleBar;
+			dock->setFeatures(features);
+		};
+
+		connect(dock, &QDockWidget::dockLocationChanged,
+			this, updateOrientation);
+		updateOrientation(dockWidgetArea(dock));
+	};
+	configureEvalBarDock(whiteEvalBarDock,
+			     m_evalBars[Chess::Side::White]);
+	configureEvalBarDock(blackEvalBarDock,
+			     m_evalBars[Chess::Side::Black]);
+
 	// Move list
 	QDockWidget* moveListDock = new QDockWidget(tr("Moves"), this);
 	moveListDock->setObjectName("MoveListDock");
@@ -403,6 +453,8 @@ void MainWindow::createDockWindows()
 	addDockWidget(Qt::RightDockWidgetArea, moveListDock);
 	splitDockWidget(moveListDock, whiteEvalDock, Qt::Horizontal);
 	splitDockWidget(whiteEvalDock, blackEvalDock, Qt::Vertical);
+	splitDockWidget(whiteEvalDock, whiteEvalBarDock, Qt::Horizontal);
+	splitDockWidget(blackEvalDock, blackEvalBarDock, Qt::Horizontal);
 
 	// Tags
 	QDockWidget* tagsDock = new QDockWidget(tr("Tags"), this);
@@ -551,6 +603,7 @@ void MainWindow::setCurrentGame(const TabData& gameData)
 			           m_gameViewer->chessClock(Chess::Side::White), nullptr);
 			disconnect(player, nullptr,
 			           m_gameViewer->chessClock(Chess::Side::Black), nullptr);
+			disconnect(player, nullptr, m_evalBarDocks[i], nullptr);
 		}
 	}
 
@@ -599,6 +652,11 @@ void MainWindow::setCurrentGame(const TabData& gameData)
 			QString name = nameOnClock(gameData.m_pgn->playerName(side),
 						   side);
 			clock->setPlayerName(name);
+			m_evalBarDocks[i]->setWindowTitle(
+				tr("%1 (%2)").arg(
+					gameData.m_pgn->playerName(side),
+					side == Chess::Side::White
+						? tr("white") : tr("black")));
 		}
 
 		m_tagsModel->setTags(gameData.m_pgn->tags());
@@ -606,8 +664,11 @@ void MainWindow::setCurrentGame(const TabData& gameData)
 		updateWindowTitle();
 		updateMenus();
 
-		for (auto evalWidget : m_evalWidgets)
-			evalWidget->setPlayer(nullptr);
+		for (int i = 0; i < 2; i++)
+		{
+			m_evalWidgets[i]->setPlayer(nullptr);
+			m_evalBars[i]->setPlayer(nullptr, Chess::Side::Type(i));
+		}
 
 		return;
 	}
@@ -633,6 +694,20 @@ void MainWindow::setCurrentGame(const TabData& gameData)
 		clock->setPlayerName(name);
 		connect(player, SIGNAL(nameChanged(QString)),
 			clock, SLOT(setPlayerName(QString)));
+		connect(player, &ChessPlayer::nameChanged,
+			m_evalBarDocks[i], [this, i, side](const QString& name)
+			{
+				m_evalBarDocks[i]->setWindowTitle(
+					tr("%1 (%2)").arg(
+						name,
+						side == Chess::Side::White
+							? tr("white") : tr("black")));
+			});
+		m_evalBarDocks[i]->setWindowTitle(
+			tr("%1 (%2)").arg(
+				player->name(),
+				side == Chess::Side::White
+					? tr("white") : tr("black")));
 
 		clock->setInfiniteTime(player->timeControl()->isInfinite());
 
@@ -649,6 +724,8 @@ void MainWindow::setCurrentGame(const TabData& gameData)
 		// not been played yet.  The PGN contains only positions that are
 		// already visible in the game viewer.
 		m_evalWidgets[i]->setPlayer(player,
+			m_game->pgn()->moves().size() - 1);
+		m_evalBars[i]->setPlayer(player, side,
 			m_game->pgn()->moves().size() - 1);
 	}
 

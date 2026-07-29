@@ -42,6 +42,7 @@ class PgnTagsModel;
 class Tournament;
 class GameTabBar;
 class EvalHistory;
+class EvalBar;
 class EvalWidget;
 class TournamentResultsDialog;
 
@@ -167,6 +168,8 @@ class MainWindow : public QMainWindow
 		PlainTextLog* m_engineDebugLog;
 
 		EvalHistory* m_evalHistory;
+		EvalBar* m_evalBars[2];
+		QDockWidget* m_evalBarDocks[2];
 		EvalWidget* m_evalWidgets[2];
 		TournamentResultsDialog* m_tournamentResultsDock;
 		QByteArray m_defaultWindowState;

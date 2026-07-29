@@ -202,6 +202,7 @@ add_executable(gui
 	projects/gui/src/gamedatabasedlg.cpp
 	projects/gui/src/importprogressdlg.cpp
 	projects/gui/src/evalhistory.cpp
+	projects/gui/src/evalbar.cpp
 	projects/gui/src/pgntoken.cpp
 	projects/gui/src/engineoptionmodel.cpp
 	projects/gui/src/stringvalidator.cpp
