@@ -49,8 +49,8 @@ MoveList::MoveList(QWidget* parent)
 	{
 		m_moveList->document()->setDefaultStyleSheet(
 			"a:link { text-decoration: none; } "
-			".move { color: white; font-weight: bold; } "
-			".comment { color: #32d74b; } "
+			".move { color: #c6c6c6; font-weight: bold; } "
+			".comment { color: #bfbfbf; } "
 			".comment.book { color: white; }");
 	}
 	else
