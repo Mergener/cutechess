@@ -266,9 +266,6 @@ void MainWindow::createActions()
 	connect(m_showSettingsAct, SIGNAL(triggered()),
 		app, SLOT(showSettingsDialog()));
 
-	connect(m_showTournamentResultsAct, SIGNAL(triggered()),
-		app, SLOT(showTournamentResultsDialog()));
-
 	connect(m_showGameDatabaseWindowAct, SIGNAL(triggered()),
 		app, SLOT(showGameDatabaseDialog()));
 
@@ -352,6 +349,16 @@ void MainWindow::createToolBars()
 
 void MainWindow::createDockWindows()
 {
+	// Tournament progress and results
+	m_tournamentResultsDock = new TournamentResultsDialog(this);
+	addDockWidget(Qt::BottomDockWidgetArea, m_tournamentResultsDock);
+	m_tournamentResultsDock->close();
+	connect(m_showTournamentResultsAct, &QAction::triggered, this, [=]()
+	{
+		m_tournamentResultsDock->show();
+		m_tournamentResultsDock->raise();
+	});
+
 	// Engine debug
 	QDockWidget* engineDebugDock = new QDockWidget(tr("Engine Debug"), this);
 	engineDebugDock->setObjectName("EngineDebugDock");
@@ -405,6 +412,7 @@ void MainWindow::createDockWindows()
 	m_viewMenu->addAction(evalHistoryDock->toggleViewAction());
 	m_viewMenu->addAction(whiteEvalDock->toggleViewAction());
 	m_viewMenu->addAction(blackEvalDock->toggleViewAction());
+	m_viewMenu->addAction(m_tournamentResultsDock->toggleViewAction());
 }
 
 void MainWindow::readSettings()
@@ -790,13 +798,12 @@ void MainWindow::newTournament()
 	GameManager* manager = CuteChessApplication::instance()->gameManager();
 
 	Tournament* t = dlg.createTournament(manager);
-	auto resultsDialog = CuteChessApplication::instance()->tournamentResultsDialog();
 	connect(t, SIGNAL(finished()),
 		this, SLOT(onTournamentFinished()));
 	connect(t, SIGNAL(gameStarted(ChessGame*, int, int, int)),
 		this, SLOT(addGame(ChessGame*)));
 	connect(t, SIGNAL(gameFinished(ChessGame*, int, int, int)),
-		resultsDialog, SLOT(update()));
+		m_tournamentResultsDock, SLOT(update()));
 	connect(t, SIGNAL(gameFinished(ChessGame*, int, int, int)),
 		this, SLOT(onGameFinished(ChessGame*)));
 	t->start();
@@ -815,7 +822,7 @@ void MainWindow::newTournament()
 	});
 	m_newTournamentAct->setEnabled(false);
 	m_stopTournamentAct->setEnabled(true);
-	resultsDialog->setTournament(t);
+	m_tournamentResultsDock->setTournament(t);
 }
 
 void MainWindow::onTournamentFinished()

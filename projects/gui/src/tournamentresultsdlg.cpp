@@ -21,15 +21,15 @@
 #include <limits>
 
 #include <QPlainTextEdit>
-#include <QBoxLayout>
 #include <QFont>
 
 #include <tournament.h>
 
 TournamentResultsDialog::TournamentResultsDialog(QWidget* parent)
-	: QDialog(parent)
+	: QDockWidget(parent)
 {
 	setWindowTitle(tr("Tournament Results"));
+	setObjectName("TournamentResultsDock");
 
 	m_resultsEdit = new QPlainTextEdit(this);
 	m_resultsEdit->setReadOnly(true);
@@ -39,11 +39,7 @@ TournamentResultsDialog::TournamentResultsDialog(QWidget* parent)
 	font.setPointSize(font.pointSize() - 1);
 	m_resultsEdit->document()->setDefaultFont(font);
 
-	auto layout = new QBoxLayout(QBoxLayout::TopToBottom);
-	layout->addWidget(m_resultsEdit);
-	layout->setContentsMargins(0, 0, 0, 0);
-
-	setLayout(layout);
+	setWidget(m_resultsEdit);
 	resize(1100, 400);
 }
 

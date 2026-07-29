@@ -34,7 +34,6 @@
 
 #include "mainwindow.h"
 #include "settingsdlg.h"
-#include "tournamentresultsdlg.h"
 #include "gamedatabasedlg.h"
 #include "gamedatabasemanager.h"
 #include "importprogressdlg.h"
@@ -49,7 +48,6 @@
 CuteChessApplication::CuteChessApplication(int& argc, char* argv[])
 	: QApplication(argc, argv),
 	  m_settingsDialog(nullptr),
-	  m_tournamentResultsDialog(nullptr),
 	  m_engineManager(nullptr),
 	  m_gameManager(nullptr),
 	  m_gameDatabaseManager(nullptr),
@@ -94,7 +92,6 @@ CuteChessApplication::~CuteChessApplication()
 {
 	delete m_gameDatabaseDialog;
 	delete m_settingsDialog;
-	delete m_tournamentResultsDialog;
 	delete m_gameWall;
 }
 
@@ -216,19 +213,6 @@ void CuteChessApplication::showSettingsDialog()
 	showDialog(m_settingsDialog);
 }
 
-void CuteChessApplication::showTournamentResultsDialog()
-{
-	showDialog(tournamentResultsDialog());
-}
-
-TournamentResultsDialog*CuteChessApplication::tournamentResultsDialog()
-{
-	if (m_tournamentResultsDialog == nullptr)
-		m_tournamentResultsDialog = new TournamentResultsDialog();
-
-	return m_tournamentResultsDialog;
-}
-
 void CuteChessApplication::showGameDatabaseDialog()
 {
 	if (m_gameDatabaseDialog == nullptr)
@@ -292,8 +276,6 @@ void CuteChessApplication::showDialog(QWidget* dlg)
 
 void CuteChessApplication::closeDialogs()
 {
-	if (m_tournamentResultsDialog)
-		m_tournamentResultsDialog->close();
 	if (m_gameDatabaseDialog)
 		m_gameDatabaseDialog->close();
 	if (m_settingsDialog)

@@ -26,7 +26,6 @@ class EngineManager;
 class GameManager;
 class MainWindow;
 class SettingsDialog;
-class TournamentResultsDialog;
 class GameDatabaseManager;
 class GameDatabaseDialog;
 class PgnImporter;
@@ -47,7 +46,6 @@ class CuteChessApplication : public QApplication
 		GameDatabaseManager* gameDatabaseManager();
 		QList<MainWindow*> gameWindows();
 		void showGameWindow(int index);
-		TournamentResultsDialog* tournamentResultsDialog();
 
 		static CuteChessApplication* instance();
 		static QString userName();
@@ -56,7 +54,6 @@ class CuteChessApplication : public QApplication
 		MainWindow* newGameWindow(ChessGame* game);
 		void newDefaultGame();
 		void showSettingsDialog();
-		void showTournamentResultsDialog();
 		void showGameDatabaseDialog();
 		void showGameWall();
 		void closeDialogs();
@@ -66,7 +63,6 @@ class CuteChessApplication : public QApplication
 		void showDialog(QWidget* dlg);
 
 		SettingsDialog* m_settingsDialog;
-		TournamentResultsDialog* m_tournamentResultsDialog;
 		EngineManager* m_engineManager;
 		GameManager* m_gameManager;
 		GameDatabaseManager* m_gameDatabaseManager;
