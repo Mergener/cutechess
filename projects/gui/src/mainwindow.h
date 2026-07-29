@@ -19,6 +19,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QByteArray>
 #include <QMainWindow>
 #include <QPointer>
 #include <board/side.h>
@@ -86,6 +87,7 @@ class MainWindow : public QMainWindow
 		void copyPgn();
 		void showAboutDialog();
 		void closeAllGames();
+		void resetLayout();
 		void adjudicateDraw();
 		void adjudicateWhiteWin();
 		void adjudicateBlackWin();
@@ -150,6 +152,7 @@ class MainWindow : public QMainWindow
 		QAction* m_pasteFenAct;
 		QAction* m_copyPgnAct;
 		QAction* m_flipBoardAct;
+		QAction* m_resetLayoutAct;
 		QAction* m_newTournamentAct;
 		QAction* m_stopTournamentAct;
 		QAction* m_showTournamentResultsAct;
@@ -166,6 +169,7 @@ class MainWindow : public QMainWindow
 		EvalHistory* m_evalHistory;
 		EvalWidget* m_evalWidgets[2];
 		TournamentResultsDialog* m_tournamentResultsDock;
+		QByteArray m_defaultWindowState;
 
 		QPointer<ChessGame> m_game;
 		QPointer<ChessPlayer> m_players[2];

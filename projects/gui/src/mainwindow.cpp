@@ -117,6 +117,7 @@ MainWindow::MainWindow(ChessGame* game)
 	createMenus();
 	createToolBars();
 	createDockWindows();
+	m_defaultWindowState = saveState();
 
 	connect(m_moveList, SIGNAL(moveClicked(int,bool)),
 	        m_gameViewer, SLOT(viewMove(int,bool)));
@@ -178,6 +179,8 @@ void MainWindow::createActions()
 	m_flipBoardAct = new QAction(tr("&Flip Board"), this);
 	m_flipBoardAct->setShortcut(Qt::CTRL | Qt::Key_F);
 
+	m_resetLayoutAct = new QAction(tr("&Reset Layout"), this);
+
 	m_adjudicateDrawAct = new QAction(tr("Ad&judicate Draw"), this);
 	m_adjudicateWhiteWinAct = new QAction(tr("Adjudicate Win for White"), this);
 	m_adjudicateBlackWinAct = new QAction(tr("Adjudicate Win for Black"), this);
@@ -231,6 +234,7 @@ void MainWindow::createActions()
 	connect(m_copyPgnAct, SIGNAL(triggered()), this, SLOT(copyPgn()));
 	connect(m_flipBoardAct, SIGNAL(triggered()),
 		m_gameViewer->boardScene(), SLOT(flip()));
+	connect(m_resetLayoutAct, SIGNAL(triggered()), this, SLOT(resetLayout()));
 	connect(m_closeGameAct, &QAction::triggered, this, [=]()
 	{
 		auto focusWindow = CuteChessApplication::activeWindow();
@@ -422,6 +426,8 @@ void MainWindow::createDockWindows()
 	m_viewMenu->addAction(whiteEvalDock->toggleViewAction());
 	m_viewMenu->addAction(blackEvalDock->toggleViewAction());
 	m_viewMenu->addAction(m_tournamentResultsDock->toggleViewAction());
+	m_viewMenu->addSeparator();
+	m_viewMenu->addAction(m_resetLayoutAct);
 }
 
 void MainWindow::readSettings()
@@ -448,6 +454,14 @@ void MainWindow::writeSettings()
 
 	s.endGroup();
 	s.endGroup();
+}
+
+void MainWindow::resetLayout()
+{
+	restoreState(m_defaultWindowState);
+
+	QSettings s;
+	s.setValue("ui/mainwindow/window_state", m_defaultWindowState);
 }
 
 void MainWindow::addGame(ChessGame* game)
