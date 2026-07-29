@@ -19,17 +19,17 @@
 #ifndef TOURNAMENTRESULTSDLG_H
 #define TOURNAMENTRESULTSDLG_H
 
-#include <QDialog>
+#include <QDockWidget>
 
 class QPlainTextEdit;
 class Tournament;
 
-class TournamentResultsDialog : public QDialog
+class TournamentResultsDialog : public QDockWidget
 {
 	Q_OBJECT
 
 	public:
-	    /* Creates a new TournamentResultsDialog. */
+	    /* Creates a dockable tournament results view. */
 	    TournamentResultsDialog(QWidget* parent = nullptr);
 	    virtual ~TournamentResultsDialog();
 
