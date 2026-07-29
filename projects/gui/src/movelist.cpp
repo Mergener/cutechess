@@ -25,6 +25,7 @@
 #include <QAction>
 #include <chessgame.h>
 #include <QMenu>
+#include <QPalette>
 
 
 MoveList::MoveList(QWidget* parent)
@@ -42,10 +43,23 @@ MoveList::MoveList(QWidget* parent)
 	m_moveList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_moveList->setOpenLinks(false);
 	m_moveList->setUndoRedoEnabled(false);
-	m_moveList->document()->setDefaultStyleSheet(
-		"a:link { text-decoration: none; } "
-		".move { color: black; font-weight: bold; } "
-		".comment { color: green; }");
+	const bool darkMode =
+		m_moveList->palette().color(QPalette::Base).lightness() < 128;
+	if (darkMode)
+	{
+		m_moveList->document()->setDefaultStyleSheet(
+			"a:link { text-decoration: none; } "
+			".move { color: white; font-weight: bold; } "
+			".comment { color: #32d74b; } "
+			".comment.book { color: white; }");
+	}
+	else
+	{
+		m_moveList->document()->setDefaultStyleSheet(
+			"a:link { text-decoration: none; } "
+			".move { color: black; font-weight: bold; } "
+			".comment { color: green; }");
+	}
 
 	#ifdef Q_OS_WIN32
 	QFont font(m_moveList->document()->defaultFont());

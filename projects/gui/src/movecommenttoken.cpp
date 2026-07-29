@@ -32,8 +32,12 @@ QString MoveCommentToken::toString() const
 
 void MoveCommentToken::vInsert(QTextCursor& cursor)
 {
-	QString html = QString("<a class=\"comment\" href=\"comment://%1@\">%2</a> ")
-		       .arg(m_ply).arg(m_text);
+	const QString cssClass =
+		m_text.compare(QStringLiteral("book"), Qt::CaseInsensitive) == 0
+			? QStringLiteral("comment book")
+			: QStringLiteral("comment");
+	QString html = QString("<a class=\"%1\" href=\"comment://%2@\">%3</a> ")
+		       .arg(cssClass).arg(m_ply).arg(m_text);
 
 	if (m_text.length() > 18)
 	{
