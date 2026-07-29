@@ -18,6 +18,7 @@
 
 class ChessPlayer;
 class MoveEvaluation;
+class QPropertyAnimation;
 
 /*!
  * \brief A white-point-of-view evaluation bar for one engine.
@@ -29,6 +30,8 @@ class MoveEvaluation;
 class EvalBar : public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(qreal displayedWhiteShare READ displayedWhiteShare
+		   WRITE setDisplayedWhiteShare)
 
 	public:
 		explicit EvalBar(QWidget* parent = nullptr);
@@ -69,10 +72,13 @@ class EvalBar : public QWidget
 
 		void showCurrentPosition();
 		void setState(const BarState& state);
+		qreal displayedWhiteShare() const;
+		void setDisplayedWhiteShare(qreal share);
 		QString scoreText() const;
-		qreal whiteShare() const;
+		qreal targetWhiteShare() const;
 
 		QPointer<ChessPlayer> m_player;
+		QPropertyAnimation* m_animation;
 		Chess::Side m_side;
 		Qt::Orientation m_orientation;
 		QHash<int, BarState> m_history;
@@ -81,6 +87,7 @@ class EvalBar : public QWidget
 		int m_score;
 		bool m_hasScore;
 		bool m_isBook;
+		qreal m_displayedWhiteShare;
 };
 
 #endif // EVALBAR_H

@@ -14,6 +14,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPainterPath>
+#include <QPropertyAnimation>
 #include <chessplayer.h>
 #include <moveevaluation.h>
 
@@ -27,16 +28,21 @@ EvalBar::BarState::BarState()
 EvalBar::EvalBar(QWidget* parent)
 	: QWidget(parent),
 	  m_player(nullptr),
+	  m_animation(new QPropertyAnimation(
+		this, "displayedWhiteShare", this)),
 	  m_side(Chess::Side::NoSide),
 	  m_orientation(Qt::Vertical),
 	  m_livePly(-1),
 	  m_viewedPly(-1),
 	  m_score(0),
 	  m_hasScore(false),
-	  m_isBook(false)
+	  m_isBook(false),
+	  m_displayedWhiteShare(0.5)
 {
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	setToolTip(tr("White point of view"));
+	m_animation->setDuration(180);
+	m_animation->setEasingCurve(QEasingCurve::OutCubic);
 }
 
 void EvalBar::setPlayer(ChessPlayer* player, Chess::Side side, int ply)
@@ -44,10 +50,7 @@ void EvalBar::setPlayer(ChessPlayer* player, Chess::Side side, int ply)
 	if (player != m_player || !player)
 	{
 		m_history.clear();
-		m_score = 0;
-		m_hasScore = false;
-		m_isBook = false;
-		update();
+		setState(BarState());
 	}
 
 	if (m_player)
@@ -141,7 +144,7 @@ void EvalBar::paintEvent(QPaintEvent* event)
 	painter.setClipPath(outline);
 	painter.fillRect(bar, Qt::black);
 
-	const qreal share = whiteShare();
+	const qreal share = m_displayedWhiteShare;
 	QRectF whiteRect;
 	if (m_orientation == Qt::Vertical)
 	{
@@ -247,6 +250,26 @@ void EvalBar::setState(const BarState& state)
 	m_score = state.score;
 	m_hasScore = state.hasScore;
 	m_isBook = state.isBook;
+
+	const qreal target = targetWhiteShare();
+	if (!qFuzzyCompare(m_displayedWhiteShare + 1.0, target + 1.0))
+	{
+		m_animation->stop();
+		m_animation->setStartValue(m_displayedWhiteShare);
+		m_animation->setEndValue(target);
+		m_animation->start();
+	}
+	update();
+}
+
+qreal EvalBar::displayedWhiteShare() const
+{
+	return m_displayedWhiteShare;
+}
+
+void EvalBar::setDisplayedWhiteShare(qreal share)
+{
+	m_displayedWhiteShare = share;
 	update();
 }
 
@@ -271,7 +294,7 @@ QString EvalBar::scoreText() const
 		.arg(double(m_score) / 100.0, 0, 'f', 2);
 }
 
-qreal EvalBar::whiteShare() const
+qreal EvalBar::targetWhiteShare() const
 {
 	if (!m_hasScore)
 		return 0.5;
