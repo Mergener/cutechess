@@ -11,6 +11,7 @@
 #include "evalbar.h"
 
 #include <QtMath>
+#include <QPalette>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPainterPath>
@@ -142,7 +143,10 @@ void EvalBar::paintEvent(QPaintEvent* event)
 
 	painter.save();
 	painter.setClipPath(outline);
-	painter.fillRect(bar, Qt::black);
+	const bool darkMode = palette().color(QPalette::Base).lightness() < 128;
+	const QColor whiteColor = darkMode ? QColor("#a3a3a3") : Qt::white;
+	const QColor blackColor = darkMode ? QColor("#222222") : Qt::black;
+	painter.fillRect(bar, blackColor);
 
 	const qreal share = m_displayedWhiteShare;
 	QRectF whiteRect;
@@ -158,7 +162,7 @@ void EvalBar::paintEvent(QPaintEvent* event)
 		whiteRect = QRectF(bar.left(), bar.top(),
 				  whiteWidth, bar.height());
 	}
-	painter.fillRect(whiteRect, Qt::white);
+	painter.fillRect(whiteRect, whiteColor);
 
 	QPen divider(QColor(128, 128, 128));
 	divider.setWidthF(1.0);
@@ -206,7 +210,7 @@ void EvalBar::paintEvent(QPaintEvent* event)
 				 bar.top(), textWidth, bar.height());
 		textOnWhite = textRect.center().x() <= whiteRect.right();
 	}
-	painter.setPen(textOnWhite ? Qt::black : Qt::white);
+	painter.setPen(textOnWhite ? blackColor : whiteColor);
 	painter.drawText(textRect, Qt::AlignHCenter | Qt::AlignVCenter, text);
 }
 
