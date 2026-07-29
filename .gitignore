@@ -81,3 +81,6 @@ CMakeLists.txt.user
 
 # Installation packages
 dist/linux/package
+
+# Builds
+build
