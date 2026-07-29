@@ -384,6 +384,7 @@ void GameViewer::onFenChanged(const QString& fen)
 void GameViewer::onMoveMade(const Chess::GenericMove& move)
 {
 	m_moves.append(move);
+	emit liveMoveChanged(m_moves.count() - 1);
 
 	m_moveNumberSlider->setEnabled(true);
 	m_moveNumberSlider->setMaximum(m_moves.count());

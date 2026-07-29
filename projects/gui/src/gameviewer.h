@@ -57,6 +57,7 @@ class GameViewer : public QWidget
 
 	signals:
 		void moveSelected(int moveNumber);
+		void liveMoveChanged(int moveNumber);
 
 	private slots:
 		void viewFirstMoveClicked();

@@ -30,7 +30,9 @@ EvalWidget::EvalWidget(QWidget *parent)
 	  m_player(nullptr),
 	  m_statsTable(new QTableWidget(1, 5, this)),
 	  m_pvTable(new QTableWidget(0, 5, this)),
-	  m_depth(-1)
+	  m_depth(-1),
+	  m_livePly(-1),
+	  m_viewedPly(-1)
 {
 	m_statsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	auto hHeader = m_statsTable->horizontalHeader();
@@ -72,6 +74,13 @@ EvalWidget::EvalWidget(QWidget *parent)
 
 void EvalWidget::clear()
 {
+	m_history[m_livePly] = EvaluationState();
+	if (m_viewedPly == m_livePly)
+		clearDisplay();
+}
+
+void EvalWidget::clearDisplay()
+{
 	m_statsTable->clearContents();
 	m_depth = -1;
 	m_pv.clear();
@@ -79,13 +88,18 @@ void EvalWidget::clear()
 	m_pvTable->setRowCount(0);
 }
 
-void EvalWidget::setPlayer(ChessPlayer* player)
+void EvalWidget::setPlayer(ChessPlayer* player, int ply)
 {
 	if (player != m_player || !player)
-		clear();
+	{
+		m_history.clear();
+		clearDisplay();
+	}
 	if (m_player)
 		m_player->disconnect(this);
 	m_player = player;
+	m_livePly = ply;
+	m_viewedPly = ply;
 	if (!player)
 		return;
 
@@ -95,7 +109,75 @@ void EvalWidget::setPlayer(ChessPlayer* player)
 		this, SLOT(onEval(MoveEvaluation)));
 }
 
+void EvalWidget::viewMove(int ply)
+{
+	m_viewedPly = ply;
+
+	// During live play GameViewer selects the new board position before
+	// ChessGame's move notification reaches this widget.  Keep showing the
+	// current evaluation until onMoveMade() has created the new snapshot.
+	if (m_viewedPly == m_livePly + 1)
+		return;
+
+	showCurrentPosition();
+}
+
+void EvalWidget::onMoveMade(int ply)
+{
+	if (ply <= m_livePly)
+		return;
+
+	// GameViewer may announce the automatically selected new move before
+	// this slot is called.  In that case m_viewedPly is already one ply
+	// ahead of m_livePly, but the widget should still follow the live game.
+	bool viewingLivePosition = (m_viewedPly == m_livePly
+				    || m_viewedPly == ply);
+
+	while (m_livePly < ply)
+	{
+		m_history[m_livePly + 1] = m_history.value(m_livePly);
+		m_livePly++;
+	}
+
+	if (viewingLivePosition)
+	{
+		m_viewedPly = m_livePly;
+		showCurrentPosition();
+	}
+}
+
+void EvalWidget::showCurrentPosition()
+{
+	clearDisplay();
+	auto it = m_history.constFind(m_viewedPly);
+	if (it == m_history.cend())
+		return;
+
+	const EvaluationState& state = it.value();
+	for (const MoveEvaluation& eval : state.evaluations)
+		updateDisplay(eval);
+	updateStats(state.stats);
+}
+
 void EvalWidget::onEval(const MoveEvaluation& eval)
+{
+	EvaluationState& state = m_history[m_livePly];
+	if (state.evaluations.isEmpty()
+	||  eval.depth() != state.depth
+	||  (eval.pv() != state.pv && !state.pv.isEmpty()))
+		state.evaluations.append(eval);
+	else
+		state.evaluations.last() = eval;
+
+	state.depth = eval.depth();
+	state.pv = eval.pv();
+	state.stats.merge(eval);
+
+	if (m_viewedPly == m_livePly)
+		updateDisplay(eval);
+}
+
+void EvalWidget::updateStats(const MoveEvaluation& eval)
 {
 	auto nps = eval.nps();
 	if (nps)
@@ -133,6 +215,11 @@ void EvalWidget::onEval(const MoveEvaluation& eval)
 		item->setText(QString("%1%").arg(rate, 0, 'f', 1));
 		m_statsTable->setItem(0, PonderHitHeader, item);
 	}
+}
+
+void EvalWidget::updateDisplay(const MoveEvaluation& eval)
+{
+	updateStats(eval);
 
 	QString depth;
 	if (eval.depth())

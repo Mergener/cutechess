@@ -21,6 +21,8 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QHash>
+#include <QVector>
 #include <moveevaluation.h>
 
 class QTableWidget;
@@ -41,13 +43,33 @@ class EvalWidget : public QWidget
 		 * Connects the widget to \a player and disconnects from
 		 * the previous player (if any).
 		 */
-		void setPlayer(ChessPlayer* player);
+		void setPlayer(ChessPlayer* player, int ply = -1);
+
+	public slots:
+		/*! Shows the evaluation state recorded after move \a ply. */
+		void viewMove(int ply);
+
+		/*! Advances the live evaluation state to newly played move \a ply. */
+		void onMoveMade(int ply);
 
 	private slots:
 		void clear();
 		void onEval(const MoveEvaluation& eval);
 
 	private:
+		struct EvaluationState
+		{
+			QVector<MoveEvaluation> evaluations;
+			MoveEvaluation stats;
+			int depth = -1;
+			QString pv;
+		};
+
+		void clearDisplay();
+		void showCurrentPosition();
+		void updateStats(const MoveEvaluation& eval);
+		void updateDisplay(const MoveEvaluation& eval);
+
 		enum StatHeaders
 		{
 			NpsHeader,
@@ -62,6 +84,9 @@ class EvalWidget : public QWidget
 		QTableWidget* m_pvTable;
 		int m_depth;
 		QString m_pv;
+		QHash<int, EvaluationState> m_history;
+		int m_livePly;
+		int m_viewedPly;
 };
 
 #endif // EVALWIDGET_H

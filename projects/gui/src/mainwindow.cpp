@@ -124,6 +124,15 @@ MainWindow::MainWindow(ChessGame* game)
 		this, SLOT(editMoveComment(int, QString)));
 	connect(m_gameViewer, SIGNAL(moveSelected(int)),
 		m_moveList, SLOT(selectMove(int)));
+	for (auto evalWidget : m_evalWidgets)
+	{
+		connect(m_gameViewer, SIGNAL(moveSelected(int)),
+			evalWidget, SLOT(viewMove(int)));
+		connect(m_gameViewer, SIGNAL(liveMoveChanged(int)),
+			evalWidget, SLOT(onMoveMade(int)));
+		connect(m_moveList, SIGNAL(moveClicked(int,bool)),
+			evalWidget, SLOT(viewMove(int)));
+	}
 
 	connect(CuteChessApplication::instance()->gameManager(),
 		SIGNAL(finished()), this, SLOT(onGameManagerFinished()),
@@ -536,7 +545,6 @@ void MainWindow::setCurrentGame(const TabData& gameData)
 		m_game->pgn()->setTagReceiver(nullptr);
 		m_gameViewer->disconnectGame();
 		disconnect(m_game, nullptr, m_moveList, nullptr);
-
 		ChessGame* tmp = m_game;
 		m_game = nullptr;
 
@@ -623,7 +631,11 @@ void MainWindow::setCurrentGame(const TabData& gameData)
 			clock, SLOT(start(int)));
 		connect(player, SIGNAL(stoppedThinking()),
 			clock, SLOT(stop()));
-		m_evalWidgets[i]->setPlayer(player);
+		// ChessGame::moves() can contain forced opening moves that have
+		// not been played yet.  The PGN contains only positions that are
+		// already visible in the game viewer.
+		m_evalWidgets[i]->setPlayer(player,
+			m_game->pgn()->moves().size() - 1);
 	}
 
 	if (m_game->boardShouldBeFlipped())
