@@ -953,10 +953,12 @@ QString Tournament::results() const
 {
 	QMultiMap<qreal, RankingData> ranking;
 	QString ret;
+	int nameWidth = 25;
 
 	for (int i = 0; i < playerCount(); i++)
 	{
 		const TournamentPlayer& player(playerAt(i));
+		nameWidth = qMax(nameWidth, player.name().size());
 		Elo elo(player.wins(), player.losses(), player.draws());
 		Elo whiteElo(player.whiteWins(),
 			     player.whiteLosses(),
@@ -1047,7 +1049,11 @@ QString Tournament::results() const
 	ResultFormatter formatter(m_tokenMap, format);
 
 	if (!ranking.isEmpty())
-		ret += formatter.entry(m_headerMap);
+	{
+		QMap<int, QString> headerMap = m_headerMap;
+		headerMap.insert(Name, QString("%1 ").arg("Name", -nameWidth));
+		ret += formatter.entry(headerMap);
+	}
 
 	int rank = hasGauntletRatingsOrder() ? -1 : 0;
 	for (auto it = ranking.constBegin(); it != ranking.constEnd(); ++it)
@@ -1055,7 +1061,7 @@ QString Tournament::results() const
 		const RankingData& data = it.value();
 		QMap<int, QString> dataMap;
 		dataMap.insert(Rank,       QString("%1 ").arg(++rank, 4));
-		dataMap.insert(Name,       QString("%1 ").arg(data.name, -25));
+		dataMap.insert(Name,       QString("%1 ").arg(data.name, -nameWidth));
 		dataMap.insert(EloDiff,    QString("%1 ").arg(data.eloDiff, 7, 'f', 0));
 		dataMap.insert(ErrorMargin,QString("%1 ").arg(data.errorMargin, 7, 'f', 0));
 		dataMap.insert(Games,      QString("%1 ").arg(data.games, 7));
@@ -1172,4 +1178,3 @@ QString ResultFormatter::entry(const QMap<int, QString>& data) const
 	ret.append("\n");
 	return ret;
 }
-

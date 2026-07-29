@@ -22,6 +22,7 @@
 
 #include <QPlainTextEdit>
 #include <QFont>
+#include <QFontDatabase>
 
 #include <tournament.h>
 
@@ -33,10 +34,11 @@ TournamentResultsDialog::TournamentResultsDialog(QWidget* parent)
 
 	m_resultsEdit = new QPlainTextEdit(this);
 	m_resultsEdit->setReadOnly(true);
+	m_resultsEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
+	m_resultsEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-	QFont font("Courier New");
-	font.setStyleHint(QFont::Monospace);
-	font.setPointSize(font.pointSize() - 1);
+	QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+	font.setPointSize(10);
 	m_resultsEdit->document()->setDefaultFont(font);
 
 	setWidget(m_resultsEdit);
